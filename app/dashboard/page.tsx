@@ -1,23 +1,13 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth";
-import { MisWorkspaceClient } from "@/components/mis/MisWorkspaceClient";
+import { ExcelDashboard } from "@/components/dashboard/ExcelDashboard";
 
 export const metadata = {
-    title: "MIS Dashboard",
-    description: "Upload an Excel file and build your own charts",
+    title: "Excel Analytics Dashboard | MIS Dashboard",
+    description: "Interactive dashboard for Excel spreadsheets and business data",
 };
 
-// Reading the login cookie is per-request data, so with cacheComponents it must sit inside <Suspense>
-export default function DashboardPage() {
-    return (
-        <Suspense fallback={<p className="p-6 text-sm text-gray-500">Loading…</p>}>
-            <Dashboard />
-        </Suspense>
-    );
-}
-
-async function Dashboard() {
+export default async function DashboardPage() {
     const user = await requireAuth();
 
     if (!user) {
@@ -25,7 +15,7 @@ async function Dashboard() {
     }
 
     return (
-        <MisWorkspaceClient
+        <ExcelDashboard
             user={{
                 name: user.name,
                 email: user.email,
