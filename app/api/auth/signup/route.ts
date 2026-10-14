@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/db/prisma";
+import { validateRequestOrigin } from "@/lib/auth";
 
 // Schema for signup input
 const signupSchema = z.object({
@@ -14,6 +15,9 @@ const signupSchema = z.object({
 });
 
 export async function POST(request: Request) {
+  if (!validateRequestOrigin(request)) {
+    return NextResponse.json({ message: "Invalid request origin." }, { status: 403 });
+  }
   try {
     const body: unknown = await request.json();
 

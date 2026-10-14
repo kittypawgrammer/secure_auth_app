@@ -22,6 +22,7 @@ model User {
   password_hash String
   is_admin      Boolean       @default(false)
   status        AccountStatus @default(PENDING)
+  token_version Int           @default(0)
 
   created_at    DateTime      @default(now()) @db.Timestamptz(3)
   updated_at    DateTime      @updatedAt @db.Timestamptz(3)
@@ -31,8 +32,37 @@ model User {
   approved_by    User?         @relation("UserApprovals", fields: [approved_by_id], references: [id], onDelete: SetNull)
 
   approved_users User[]       @relation("UserApprovals")
+  datasets       UploadedDataset[]
 
   @@index([status, created_at])
   @@index([approved_by_id])
   @@map("users")
+}
+
+model UploadedDataset {
+  id             String         @id @default(uuid()) @db.Uuid
+  filename       String
+  file_size      Int
+  created_at     DateTime       @default(now()) @db.Timestamptz(3)
+  uploaded_by_id String         @db.Uuid
+  uploaded_by    User           @relation(fields: [uploaded_by_id], references: [id], onDelete: Cascade)
+  sheets         DatasetSheet[]
+
+  @@index([uploaded_by_id, created_at])
+  @@map("uploaded_datasets")
+}
+
+model DatasetSheet {
+  id           String          @id @default(uuid()) @db.Uuid
+  dataset_id   String          @db.Uuid
+  dataset      UploadedDataset @relation(fields: [dataset_id], references: [id], onDelete: Cascade)
+  sheet_name   String
+  row_count    Int
+  columns      Json            // Array of { key: string, name: string, type: 'number' | 'string' | 'date' | 'boolean' }
+  rows         Json            // Array of row records
+  summary      Json            // Precomputed analytics
+  sort_order   Int             @default(0)
+
+  @@index([dataset_id])
+  @@map("dataset_sheets")
 }

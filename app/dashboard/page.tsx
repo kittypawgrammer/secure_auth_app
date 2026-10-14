@@ -1,9 +1,26 @@
-export const metadata = { title: "Dashboard | MIS Dashboard" };
+import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
+import { ExcelDashboard } from "@/components/dashboard/ExcelDashboard";
 
-export default function DashboardPage() {
+export const metadata = {
+    title: "Excel Analytics Dashboard | MIS Dashboard",
+    description: "Interactive dashboard for Excel spreadsheets and business data",
+};
+
+export default async function DashboardPage() {
+    const user = await requireAuth();
+
+    if (!user) {
+        redirect("/login");
+    }
+
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-semibold">Dashboard (coming soon)</h1>
-        </div>
+        <ExcelDashboard
+            user={{
+                name: user.name,
+                email: user.email,
+                is_admin: user.is_admin,
+            }}
+        />
     );
 }

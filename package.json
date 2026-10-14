@@ -15,10 +15,13 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^18.0.7",
     "jose": "^6.2.12",
+    "lucide-react": "^1.57.0",
     "next": "16.4.0",
     "pg": "^8.23.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "recharts": "^3.10.1",
+    "xlsx": "^0.18.5",
     "zod": "^4.6.6"
   },
   "devDependencies": {

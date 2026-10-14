@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/db/prisma";
-import { createSession } from "@/lib/auth";
+import { createSession, validateRequestOrigin } from "@/lib/auth";
 
 // 1. Shape of the data we expect
 const loginSchema = z.object({
@@ -11,6 +11,9 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: Request) {
+    if (!validateRequestOrigin(request)) {
+        return NextResponse.json({ message: "Invalid request origin." }, { status: 403 });
+    }
     try {
         // 2. Validate input on the server
         const result = loginSchema.safeParse(await request.json());
@@ -45,7 +48,8 @@ export async function POST(request: Request) {
         await createSession(user.id);
 
         return NextResponse.json({ message: "Logged in.", isAdmin: user.is_admin });
-    } catch {
+    } catch (err: unknown) {
+        console.error("Login route error:", err);
         return NextResponse.json({ message: "Unable to log in. Please try again." }, { status: 500 });
     }
 }
